@@ -42,7 +42,7 @@ compileJava.doLast {
         def target = source
         main 'org.eclipse.persistence.tools.weaving.jpa.StaticWeave'
         args '-persistenceinfo', source, source, target
-        classpath sourceSets.main.runtimeClasspath
+        classpath = sourceSets.main.runtimeClasspath + project(':fineract-core').sourceSets.main.output
     }
     delete {
         delete "${source}/META-INF/persistence.xml"
@@ -379,7 +379,7 @@ task devRun(type: org.springframework.boot.gradle.tasks.run.BootRun) {
     // Configure the build to skip quality checks
     gradle.taskGraph.whenReady { graph ->
         if (graph.hasTask(devRun)) {
-            tasks.matching { task -> 
+            tasks.matching { task ->
                 task.name in ['checkstyle', 'checkstyleMain', 'checkstyleTest',
                             'spotlessCheck', 'spotlessApply',
                             'spotbugsMain', 'spotbugsTest',
@@ -400,8 +400,10 @@ task devRun(type: org.springframework.boot.gradle.tasks.run.BootRun) {
     classpath = bootRun.classpath
     mainClass = bootRun.mainClass
     jvmArgs = bootRun.jvmArgs
-    
+
     doFirst {
         println "Running in development mode - quality checks are disabled"
     }
 }
+
+compileJava.dependsOn(':fineract-core:compileJava')

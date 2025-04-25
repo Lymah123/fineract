@@ -197,7 +197,7 @@ public class FixedDepositAccount extends SavingsAccount {
         String refNo = null;
         final Money transactionAmountMoney = Money.of(getCurrency(), this.accountTermAndPreClosure.depositAmount());
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.deposit(null, office(), null,
-                this.accountSubmittedOrActivationDate(), transactionAmountMoney, refNo);
+                this.accountSubmittedOrActivationDate(), transactionAmountMoney, refNo, ExternalId.empty());
         transaction.setRunningBalance(transactionAmountMoney);
         transaction.updateCumulativeBalanceAndDates(this.getCurrency(), interestCalculatedUpto());
         allTransactions.add(transaction);
@@ -541,7 +541,8 @@ public class FixedDepositAccount extends SavingsAccount {
             final SavingsAccountTransaction postingTransaction = findInterestPostingTransactionFor(interestPostingTransactionDate);
             if (postingTransaction == null) {
                 final SavingsAccountTransaction newPostingTransaction = SavingsAccountTransaction.interestPosting(this, office(),
-                        interestPostingTransactionDate, interestEarnedToBePostedForPeriod, interestPostingPeriod.isUserPosting());
+                        interestPostingTransactionDate, interestEarnedToBePostedForPeriod, interestPostingPeriod.isUserPosting(),
+                        ExternalId.empty());
                 this.transactions.add(newPostingTransaction);
                 recalucateDailyBalanceDetails = true;
             } else {
@@ -549,7 +550,8 @@ public class FixedDepositAccount extends SavingsAccount {
                 if (correctionRequired) {
                     postingTransaction.reverse();
                     final SavingsAccountTransaction newPostingTransaction = SavingsAccountTransaction.interestPosting(this, office(),
-                            interestPostingTransactionDate, interestEarnedToBePostedForPeriod, interestPostingPeriod.isUserPosting());
+                            interestPostingTransactionDate, interestEarnedToBePostedForPeriod, interestPostingPeriod.isUserPosting(),
+                            ExternalId.empty());
                     this.transactions.add(newPostingTransaction);
                     recalucateDailyBalanceDetails = true;
                 }
@@ -583,7 +585,7 @@ public class FixedDepositAccount extends SavingsAccount {
         if (!remainigInterestToBePosted.isZero()) {
             final boolean postInterestAsOn = false;
             final SavingsAccountTransaction newPostingTransaction = SavingsAccountTransaction.interestPosting(this, office(),
-                    accountCloseDate, remainigInterestToBePosted, postInterestAsOn);
+                    accountCloseDate, remainigInterestToBePosted, postInterestAsOn, ExternalId.empty());
             this.transactions.add(newPostingTransaction);
             recalucateDailyBalance = true;
         }

@@ -47,6 +47,7 @@ import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
@@ -392,7 +393,7 @@ public class InteropServiceImpl implements InteropService {
             PaymentDetail paymentDetail = instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(),
                     transferCode, null);
             SavingsAccountTransaction holdTransaction = SavingsAccountTransaction.holdAmount(savingsAccount, savingsAccount.office(),
-                    paymentDetail, transactionDate, Money.of(savingsAccount.getCurrency(), total), false);
+                    paymentDetail, transactionDate, Money.of(savingsAccount.getCurrency(), total), false, ExternalId.empty());
             MonetaryCurrency accountCurrency = savingsAccount.getCurrency().copy();
             holdTransaction.setRunningBalance(
                     Money.of(accountCurrency, savingsAccount.getWithdrawableBalance().subtract(holdTransaction.getAmount())));
@@ -456,11 +457,11 @@ public class InteropServiceImpl implements InteropService {
             SavingsTransactionBooleanValues transactionValues = new SavingsTransactionBooleanValues(false, true, true, false, false);
             transaction = savingsAccountService.handleWithdrawal(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(),
                     instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null),
-                    transactionValues, backdatedTxnsAllowedTill);
+                    transactionValues, backdatedTxnsAllowedTill, ExternalId.empty());
         } else {
             transaction = savingsAccountService.handleDeposit(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(),
                     instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null),
-                    false, true, backdatedTxnsAllowedTill);
+                    false, true, backdatedTxnsAllowedTill, ExternalId.empty());
         }
 
         String note = request.getNote();

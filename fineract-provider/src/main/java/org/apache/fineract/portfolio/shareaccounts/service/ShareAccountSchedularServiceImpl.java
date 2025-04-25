@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.shareaccounts.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
@@ -44,7 +45,7 @@ public class ShareAccountSchedularServiceImpl implements ShareAccountSchedularSe
                 .orElseThrow();
         final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(savingsId, false);
         SavingsAccountTransaction savingsAccountTransaction = this.savingsAccountDomainService.handleDividendPayout(savingsAccount,
-                DateUtils.getBusinessLocalDate(), shareAccountDividendDetails.getAmount(), false);
+                DateUtils.getBusinessLocalDate(), shareAccountDividendDetails.getAmount(), false, ExternalId.empty());
         shareAccountDividendDetails.update(ShareAccountDividendStatusType.POSTED.getValue(), savingsAccountTransaction.getId());
         this.shareAccountDividendRepository.saveAndFlush(shareAccountDividendDetails);
     }
